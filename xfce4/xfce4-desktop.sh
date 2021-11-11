@@ -84,7 +84,7 @@ cat <<-\EOF > "$HOME/.config/Thunar/uca.xml"
 	</actions>
 EOF
 
-echo "Creating basic bookmarks for thunar"
+echo "Creating basic bookmarks for thunar..."
 sleep 1
 cat <<-EOF >> "$HOME/.config/gtk-3.0/bookmarks"
 	"file:///home/$scriptuser/Documents"
