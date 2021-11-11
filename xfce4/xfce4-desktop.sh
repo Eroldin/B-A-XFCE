@@ -1,28 +1,51 @@
 #!/bin/zsh
 
+# This script is intended for the use AFTER the aui install according to my tutorial.
+# You are expected to have read the script file, and changed it according to your needs.
+
 scriptuser="$USER"
+echo "Installing autofs..."
+sleep 1
+trizen -S autofs --noedit --skipinteg
+echo "Preparing for migration from sudo to opendoas..."
+sleep 1
 echo "permit persist :wheel" | sudo tee /etc/doas.conf >/dev/null
 trizen -S opendoas opendoas-sudo --noedit
-trizen -S autofs --noedit --skipinteg
+echo "Removing sudo restfiles..."
+sleep 1
 doas rm -rf /etc/sudoers.* -v
+echo "Removing and installing packages for better user experience..."
+sleep 1
 trizen -Rns xarchiver mupdf mousepad xfce4-taskmanager
 trizen -S engrampa atril gnome-system-monitor xed onlyoffice-bin masterpdfeditor-free plank vimix-icon-theme dracula-gtk-theme whatsapp-for-linux hunspell-nl aspell-en aspell-nl lightdm-gtk-greeter-settings pipewire pipewire-pulse gst-plugin-pipewire blueberry ttf-roboto popsicle-bin --noedit
-doas pacman -Rns $(pacman -Qdqt)
-doas pacman -Syu
-trizen -Sc
-doas usermod "$scriptuser" -aG rfkill
+echo "Updating the system, and cleaning the orphans and pacman cache..."
+sleep 1
+trizen -Syu
+trizen -Rns $(pacman -Qdqt)
+yes | trizen -Sc
+echo "Adding $scriptuser to the rfkill group..."
+sleep 1
+doas usermod -v "$scriptuser" -aG rfkill
+echo "Changing the keyboard to the US Intl layout..."
+sleep 1
 doas localectl set-x11-keymap us pc105 intl
+setxkbmap -print -verbose
+echo "Downloading the Dracula Plank theme and moving the theme and B-A-XFCE's wallpaper to their intended locations."
+sleep 1
 git clone https://github.com/dracula/plank /tmp/plank
 doas mv /tmp/plank/Dracula /usr/share/plank/themes/ -v
-doas chown root:root /usr/share/plank/themes/Dracula
+doas chown root:root /usr/share/plank/themes/Dracula -v
 doas mv /Basic_Arch/*.jpg /usr/share/backgrounds -v
 doas chmod 644 /usr/share/backgrounds/*.jpg -v
 doas chmod 755 /usr/share/plank/themes/Dracula -v
 doas chmod 644 /usr/share/plank/themes/Dracula/* -v
+echo "Preparing the config folders for Thunar..."
+sleep 1
 mkdir -vp "$HOME/.config/Thunar"
 mkdir -v "$HOME/.config/gtk-3.0"
 
-echo "Creating usefull aliases for zsh"
+echo "Creating usefull aliases for zsh..."
+sleep 1
 cat <<-\EOF >> "$HOME/.zshrc"
 
 	alias trizen="trizen --noedit"
@@ -32,6 +55,7 @@ cat <<-\EOF >> "$HOME/.zshrc"
 EOF
 
 echo "Creating Thunar actions..."
+sleep 1
 cat <<-\EOF > "$HOME/.config/Thunar/uca.xml"
 	<?xml version="1.0" encoding="UTF-8"?>
 	<actions>
@@ -60,7 +84,8 @@ cat <<-\EOF > "$HOME/.config/Thunar/uca.xml"
 	</actions>
 EOF
 
-"Crating basic bookmarks for thunar"
+echo "Creating basic bookmarks for thunar"
+sleep 1
 cat <<-EOF >> "$HOME/.config/gtk-3.0/bookmarks"
 	"file:///home/$scriptuser/Documents"
 	"file:///home/$scriptuser/Pictures"
